@@ -1,6 +1,9 @@
 // API countries url
 const apiCountries = "https://restcountries.com/v3.1/all";
 
+// API key for OpenWeatherMap
+const APIkey = "0c5fd0f5b0a5c82c853f37b019878fa1";
+
 // RegExp for country name
 const countryNameRegExp = /^[a-zA-Z\s]+$/;
 
@@ -52,7 +55,6 @@ countryInput.addEventListener("input", async (event) => {
       country.name.common.toLowerCase().startsWith(search)
     );
 
-    console.log(filteredCountries);
     // messages
     if (filteredCountries.length > 10) {
       message.textContent = "Too many results. Please refine your search.";
@@ -66,6 +68,10 @@ countryInput.addEventListener("input", async (event) => {
       messageVisible = true;
       return;
     }
+    if (filteredCountries.length === 1) {
+      displayCountryDetails(filteredCountries[0]);
+      return;
+    }
     displayCountries(filteredCountries);
   } catch (error) {
     console.error("Error fetching countries:", error);
@@ -75,20 +81,99 @@ countryInput.addEventListener("input", async (event) => {
 // Function for display Countries result
 
 const displayCountries = (Countries) => {
-    Countries.forEach(country => {
+  Countries.forEach((country) => {
+    const countryCard = document.createElement("div");
+    countryCard.classList.add("countryCard");
 
-        const countryCard = document.createElement('div');
-        countryCard.classList.add('countryCard');
+    const flagImg = document.createElement("img");
+    flagImg.src = country.flags.svg;
+    flagImg.alt = `Flag of ${country.name.common}`;
 
-        const flagImg = document.createElement('img');
-        flagImg.src = country.flags.svg;
-        flagImg.alt = `Flag of ${country.name.common}`;
+    const countryName = document.createElement("h2");
+    countryName.textContent = country.name.common;
 
-        const countryName = document.createElement('h2');
-        countryName.textContent = country.name.common;
+    countryCard.appendChild(flagImg);
+    countryCard.appendChild(countryName);
+    countriesContainer.appendChild(countryCard);
+  });
+};
 
-        countryCard.appendChild(flagImg);
-        countryCard.appendChild(countryName);
-        countriesContainer.appendChild(countryCard);
-    });
+// Function to fetch weather data from OpenWeatherMap API
+const getWeather = async (lat, lon) => {
+  try {
+    const response = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${APIkey}`
+    );
+    const weatherDetails = await response.json();
+
+    return {
+      weather: weatherDetails.weather[0].description,
+      icon: weatherDetails.weather[0].icon,
+      temperature: weatherDetails.main.temp - 273.15,
+    };
+  } catch (error) {
+    console.error("Error fetching weather:", error);
+  }
+};
+
+// Function for display country details
+
+const displayCountryDetails = async (country) => {
+  const lat = country.latlng[0];
+  const lon = country.latlng[1];
+  const weatherInfo = await getWeather(lat, lon);
+  const icon = weatherInfo.icon;
+  const temperature = weatherInfo.temperature;
+  const weather = weatherInfo.weather;
+
+  const countryDetails = document.createElement("div");
+  countryDetails.classList.add("countryDetails");
+
+  const flagImg = document.createElement("img");
+  flagImg.src = country.flags.svg;
+  flagImg.alt = `Flag of ${country.name.common}`;
+
+  const countryName = document.createElement("h2");
+  countryName.textContent = country.name.common;
+
+  const capital = document.createElement("p");
+  capital.textContent = `Capital: ${country.capital}`;
+
+  const population = document.createElement("p");
+  population.textContent = `Population: ${country.population.toLocaleString(
+    "en-US"
+  )}`;
+
+  const region = document.createElement("p");
+  region.textContent = `Region: ${country.region}`;
+
+  const continent = document.createElement("p");
+  continent.textContent = `Continent: ${country.continents}`;
+
+  const timezone = document.createElement("p");
+  timezone.textContent = `Timezone: ${country.timezones}`;
+
+  const iconImg = document.createElement("img");
+
+  iconImg.src = `https://openweathermap.org/img/wn/${icon}@2x.png`;
+  iconImg.alt = `${weather} icon`;
+
+  const weatherDescription = document.createElement("p");
+  weatherDescription.textContent = `${weather}`;
+
+  const temperatureDescription = document.createElement("p");
+  temperatureDescription.textContent = `${temperature} °C`;
+
+  countryDetails.appendChild(flagImg);
+  countryDetails.appendChild(countryName);
+  countryDetails.appendChild(capital);
+  countryDetails.appendChild(population);
+  countryDetails.appendChild(region);
+  countryDetails.appendChild(continent);
+  countryDetails.appendChild(timezone);
+  countryDetails.appendChild(iconImg);
+  countryDetails.appendChild(weatherDescription);
+  countryDetails.appendChild(temperatureDescription);
+
+  countriesContainer.appendChild(countryDetails);
 };
