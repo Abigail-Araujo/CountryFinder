@@ -2,7 +2,7 @@
 const apiCountries = "https://restcountries.com/v3.1/all";
 
 // API key for OpenWeatherMap
-const APIkey = "0c5fd0f5b0a5c82c853f37b019878fa1";
+const APIkey = "";
 
 // RegExp for country name
 const countryNameRegExp = /^[a-zA-Z\s]+$/;
