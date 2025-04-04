@@ -18,18 +18,21 @@ You can see the application in action here: [Country Finder](https://abigail-ara
 * **CSS:** Visual styles and responsive design.
 * **JavaScript:** Application logic, DOM manipulation, and consumption of the REST Countries API.
 * **API:** [REST Countries](https://restcountries.com/) for obtaining detailed country information.
+* **API:** [OpenWeatherMap Current Weather Data](https://openweathermap.org/current) for obtaining weather information.
 
 ## Features 🔍
 
 * **Intelligent Search:** Allows searching for countries by name, accepting partial and complete matches.
 * **Concise Visualization:** Displays a list of up to 10 matching countries, presenting the flag and name of each.
 * **Informative Messages:** Provides clear feedback to the user, for example, indicating the need to refine the search if more than 10 results are found.
+* **Country Details with Weather:** When the search matches a single country, detailed country information is displayed along with the current weather obtained from the OpenWeatherMap API.
 
 ## Usage ✔
 
 1.  Access the application through the following link: [Country Finder](https://abigail-araujo.github.io/CountryFinder/)
 2.  Use the search field to enter the name of the country (or part of the name) you want to find.
 3.  View the results, which will display the flag and name of the matching countries.
+4.  If the search matches a single country, additional country details along with the current weather will be displayed.
 
 ## Future Improvements 📝
 
