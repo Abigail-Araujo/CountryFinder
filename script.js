@@ -2,20 +2,71 @@
 const apiCountries = "https://restcountries.com/v3.1/all";
 
 // API key for OpenWeatherMap
-const APIkey = "0c5fd0f5b0a5c82c853f37b019878fa1";
+import { APIkey } from './key.js';
 
 // RegExp for country name
 const countryNameRegExp = /^[a-zA-Z\s]+$/;
 
 //Dom elements
 const countryInput = document.querySelector("#countryInput");
-const countriesContainer = document.querySelector("#countriesContainer");
+let countriesContainer = document.querySelector("#countriesContainer");
 const message = document.querySelector("#message");
+
+let inputValue;
+
+// Filtered countries array
+let filteredCountries = [];
+
+// Display countries elements
+let countryCard;
+let flagImg;
+let countryName;
+
+// Display country details elements
+let lat;
+let lon;
+let icon;
+let temperature;
+let weather;
 
 //bool for message
 let messageVisible = false;
 
-// Function to fetch countries data from API and filter based on input
+// Function to fetch countries data from API
+const getCountries = async () => {
+  try {
+    countriesContainer.innerHTML = `<div class="loader"></div>`;
+    const response = await fetch(apiCountries);
+    const countries = await response.json();
+    filteredCountries = countries.filter((country) =>
+      country.name.common.toLowerCase().startsWith(inputValue)
+    );
+  } catch (error) {
+    console.error("Error fetching countries:", error);
+  }
+  finally {
+    countriesContainer.innerHTML = ""; // Clear loader
+  }
+};
+
+// Function to fetch weather data from OpenWeatherMap API
+const getWeather = async () => {
+  try {
+    countriesContainer.innerHTML = `<div class="loader"></div>`;
+    const response = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${APIkey}`
+    );
+    const weatherDetails = await response.json();
+
+    weather = weatherDetails.weather[0].description;
+    icon = weatherDetails.weather[0].icon;
+    temperature = (weatherDetails.main.temp - 273.15).toFixed(2);
+  } catch (error) {
+    console.error("Error fetching weather:", error);
+  }
+};
+
+// Function to filter based on input value
 countryInput.addEventListener("input", async (event) => {
   // Clear previous results
   countriesContainer.innerHTML = "";
@@ -28,7 +79,7 @@ countryInput.addEventListener("input", async (event) => {
   // Check if the input start with a space
   event.target.value = event.target.value.replace(/^\s/g, "");
 
-  const inputValue = event.target.value;
+  inputValue = event.target.value;
 
   // Check if the input is empty
   if (inputValue === "") {
@@ -47,49 +98,43 @@ countryInput.addEventListener("input", async (event) => {
   }
 
   // Fetch countries data from API and filter based on input
-  const search = inputValue.toLowerCase();
-  try {
-    const response = await fetch(apiCountries);
-    const countries = await response.json();
-    const filteredCountries = countries.filter((country) =>
-      country.name.common.toLowerCase().startsWith(search)
-    );
-
-    // messages
-    if (filteredCountries.length > 10) {
-      message.textContent = "Too many results. Please refine your search.";
-      message.classList.remove("hidden");
-      messageVisible = true;
-      return;
-    }
-    if (filteredCountries.length === 0) {
-      message.textContent = `No countries found for "${search}"`;
-      message.classList.remove("hidden");
-      messageVisible = true;
-      return;
-    }
-    if (filteredCountries.length === 1) {
-      displayCountryDetails(filteredCountries[0]);
-      return;
-    }
-    displayCountries(filteredCountries);
-  } catch (error) {
-    console.error("Error fetching countries:", error);
+  inputValue = inputValue.toLowerCase();
+  await getCountries();
+  // messages
+  if (filteredCountries.length > 10) {
+    message.textContent = "Too many results. Please refine your search.";
+    message.classList.remove("hidden");
+    messageVisible = true;
+    return;
   }
+  if (filteredCountries.length === 0) {
+    message.textContent = `No countries found for "${inputValue}"`;
+    message.classList.remove("hidden");
+    messageVisible = true;
+    return;
+  }
+  if (filteredCountries.length === 1) {
+    lat = filteredCountries[0].latlng[0];
+    lon = filteredCountries[0].latlng[1];
+    await getWeather();
+    displayCountryDetails(filteredCountries[0]);
+    return;
+  }
+  displayCountries(filteredCountries);
 });
 
 // Function for display Countries result
 
-const displayCountries = (Countries) => {
-  Countries.forEach((country) => {
-    const countryCard = document.createElement("div");
+const displayCountries = (countries) => {
+  countries.forEach((country) => {
+    countryCard = document.createElement("div");
     countryCard.classList.add("countryCard");
 
-    const flagImg = document.createElement("img");
+    flagImg = document.createElement("img");
     flagImg.src = country.flags.svg;
     flagImg.alt = `Flag of ${country.name.common}`;
 
-    const countryName = document.createElement("h2");
+    countryName = document.createElement("h2");
     countryName.textContent = country.name.common;
 
     countryCard.appendChild(flagImg);
@@ -98,82 +143,31 @@ const displayCountries = (Countries) => {
   });
 };
 
-// Function to fetch weather data from OpenWeatherMap API
-const getWeather = async (lat, lon) => {
-  try {
-    const response = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${APIkey}`
-    );
-    const weatherDetails = await response.json();
-
-    return {
-      weather: weatherDetails.weather[0].description,
-      icon: weatherDetails.weather[0].icon,
-      temperature: weatherDetails.main.temp - 273.15,
-    };
-  } catch (error) {
-    console.error("Error fetching weather:", error);
-  }
-};
-
 // Function for display country details
 
-const displayCountryDetails = async (country) => {
-  const lat = country.latlng[0];
-  const lon = country.latlng[1];
-  const weatherInfo = await getWeather(lat, lon);
-  const icon = weatherInfo.icon;
-  const temperature = weatherInfo.temperature;
-  const weather = weatherInfo.weather;
-
-  const countryDetails = document.createElement("div");
-  countryDetails.classList.add("countryDetails");
-
-  const flagImg = document.createElement("img");
-  flagImg.src = country.flags.svg;
-  flagImg.alt = `Flag of ${country.name.common}`;
-
-  const countryName = document.createElement("h2");
-  countryName.textContent = country.name.common;
-
-  const capital = document.createElement("p");
-  capital.textContent = `Capital: ${country.capital}`;
-
-  const population = document.createElement("p");
-  population.textContent = `Population: ${country.population.toLocaleString(
-    "en-US"
-  )}`;
-
-  const region = document.createElement("p");
-  region.textContent = `Region: ${country.region}`;
-
-  const continent = document.createElement("p");
-  continent.textContent = `Continent: ${country.continents}`;
-
-  const timezone = document.createElement("p");
-  timezone.textContent = `Timezone: ${country.timezones}`;
-
-  const iconImg = document.createElement("img");
-
-  iconImg.src = `https://openweathermap.org/img/wn/${icon}@2x.png`;
-  iconImg.alt = `${weather} icon`;
-
-  const weatherDescription = document.createElement("p");
-  weatherDescription.textContent = `${weather}`;
-
-  const temperatureDescription = document.createElement("p");
-  temperatureDescription.textContent = `${temperature} °C`;
-
-  countryDetails.appendChild(flagImg);
-  countryDetails.appendChild(countryName);
-  countryDetails.appendChild(capital);
-  countryDetails.appendChild(population);
-  countryDetails.appendChild(region);
-  countryDetails.appendChild(continent);
-  countryDetails.appendChild(timezone);
-  countryDetails.appendChild(iconImg);
-  countryDetails.appendChild(weatherDescription);
-  countryDetails.appendChild(temperatureDescription);
-
-  countriesContainer.appendChild(countryDetails);
+const displayCountryDetails = (country) => {
+  countriesContainer.innerHTML = `
+  <div class="countryDetails">
+    <div class="flagAndWeather">
+      <img class="flag" src="${country.flags.svg}"alt="Flag of ${
+    country.name.common
+  }">
+      <div class="weatherDetails">
+        <div class="weather">
+          <img src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="${weather} icon">
+          <p>${weather}</p>
+        </div>
+        <p>${temperature} °C</p>
+      </div>
+    </div>
+    <div class="countryInfo">
+      <h2>${country.name.common}</h2>
+      <p>Capital: ${country.capital}</p>
+      <p>Population: ${country.population.toLocaleString("en-US")}</p>
+      <p>Region: ${country.region}</p>
+      <p>Continent: ${country.continents}</p>
+      <p>Timezone: ${country.timezones}</p>
+    </div>
+  </div>
+  `;
 };

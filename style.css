@@ -8,6 +8,31 @@
     box-sizing: border-box;
 }
 
+body {
+    background-image: url('img/bg.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+footer {
+    background: rgba(255, 255, 255, 0.743);
+    backdrop-filter: blur(3px);
+    width: 100%;
+    padding: 1rem;
+}
+
+footer a {
+    color: rgb(116, 38, 189);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+#footer {
+    text-align: center;
+    font-size: 18px;
+}
+
 /* Auxiliary styles */
 .hidden {
     display: none;
@@ -23,7 +48,8 @@
 }
 
 #container {
-    min-height: 100vh;
+    min-height: calc(100vh - 59px);
+    background: rgba(112, 104, 104, 0.322);
 }
 
 #searcher, #countriesContainer {
@@ -33,21 +59,24 @@
 #searcher h1 {
     text-align: center;
     margin-bottom: 15px;
+    color: white;
 }
 
 #message {
     margin-top: 15px;
     text-align: center;
+    font-size: 18px;
+    color: white;
 }
 
 #searcher input[type="text"] {
     width: 100%;
     max-width: 600px;
-    padding: 20px;
-    background-color: gainsboro;
+    padding: 15px;
+    background-color: white;
     border-radius: 8px;
     border-style: none;
-    font-size: 20px;
+    font-size: 18px;
 }
 
 /* Styles for the countries container and its elements */
@@ -80,4 +109,92 @@
     max-width: 100%;
     height: auto;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.countryDetails {
+    display: flex;
+    width: 90%;
+    background: rgba(255, 255, 255, 0.53);
+    border-radius: 8px;
+    padding: 20px;
+    gap: 25px;
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.3);;
+}
+
+.flagAndWeather {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+}
+
+.flag {
+    width: 100%;
+    height: auto;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+.weatherDetails {
+    background: rgba(112, 104, 104, 0.624);
+    border-radius: 5px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 5px 20px 0px 10px;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+}
+
+.weather {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.weather img {
+    width: 60px;
+    height: auto;
+}
+
+.countryInfo {
+    padding: 20px;
+    width: 100%;
+    color: white;
+    background: rgba(112, 104, 104, 0.624);
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+.countryInfo h2 {
+    text-align: center;
+}
+
+.loader {
+    border: 8px solid white;
+    /* Light grey */
+    border-top: 8px solid #25d732;
+    /* Blue */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .countryDetails {
+        flex-direction: column;
+        gap: 10px;
+    }
 }
