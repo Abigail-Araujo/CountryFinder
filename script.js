@@ -1,9 +1,6 @@
 // API countries url
 const apiCountries = "https://restcountries.com/v3.1/all";
 
-// API key for OpenWeatherMap
-// import { APIkey } from './key.js';
-
 // RegExp for country name
 const countryNameRegExp = /^[a-zA-Z\s]+$/;
 
@@ -54,7 +51,7 @@ const getWeather = async () => {
   try {
     countriesContainer.innerHTML = `<div class="loader"></div>`;
     const response = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${APIkey}`
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=0c5fd0f5b0a5c82c853f37b019878fa1`
     );
     const weatherDetails = await response.json();
 
