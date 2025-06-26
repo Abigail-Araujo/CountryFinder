@@ -1,5 +1,5 @@
 // API countries url
-const apiCountries = "https://restcountries.com/v3.1/all";
+const apiCountries = "https://restcountries.com/v3.1/all?fields=name";
 
 // RegExp for country name
 const countryNameRegExp = /^[a-zA-Z\s]+$/;
